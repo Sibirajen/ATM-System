@@ -1,108 +1,118 @@
 #include <iostream>
-#include <stdlib.h>
-#include <string.h>
-using namespace std;
-class Bank {
+#include <vector>
 
+class Account {
 private:
-	string name;
-	long long accnumber;
-	char type[10];
-	long long amount = 0;
-	long long tot = 0;
+    int accountNumber;
+    std::string accountHolder;
+    double balance;
 
 public:
-	void setvalue()
-	{
-		cout << "Enter name\n";
-		cin.ignore();
-		getline(cin, name);
-		cout << "Enter Account number\n";
-		cin >> accnumber;
-		cout << "Enter Account type\n";
-		cin >> type;
-		cout << "Enter Balance\n";
-		cin >> tot;
-	}
 
-	// Function to display the required data
-	void showdata()
-	{
-		cout << "Name:" << name << endl;
-		cout << "Account No:" << accnumber << endl;
-		cout << "Account type:" << type << endl;
-		cout << "Balance:" << tot << endl;
-	}
+    Account(int number, std::string holder, double initialBalance) {
+        accountNumber = number;
+        accountHolder = holder;
+        balance = initialBalance;
+    }
 
-	// Function to deposit the amount in ATM
-	void deposit()
-	{
-		cout << "\nEnter amount to be Deposited\n";
-		cin >> amount;
-	}
+    int getAccountNumber() const {
+        return accountNumber;
+    }
 
-	// Function to show the balance amount
-	void showbal()
-	{
-		tot = tot + amount;
-		cout << "\nTotal balance is: " << tot;
-	}
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            std::cout << "Deposited $" << amount << " into account " << accountNumber << std::endl;
+        }
+    }
 
-	// Function to withdraw the amount in ATM
-	void withdrawl()
-	{
-		int a, avai_balance;
-		cout << "Enter amount to withdraw\n";
-		cin >> a;
-		avai_balance = tot - a;
-		cout << "Available Balance is" << avai_balance;
-	}
+    void withdraw(double amount) {
+        if (amount > 0 && balance >= amount) {
+            balance -= amount;
+            std::cout << "Withdrawn $" << amount << " from account " << accountNumber << std::endl;
+        } else {
+            std::cout << "Insufficient balance or invalid amount for account " << accountNumber << std::endl;
+        }
+    }
+
+    void display() const {
+        std::cout << "Account Number: " << accountNumber << std::endl;
+        std::cout << "Account Holder: " << accountHolder << std::endl;
+        std::cout << "Balance: $" << balance << std::endl;
+    }
 };
 
-int main()
-{
-	Bank b;
-	int choice;
+int main() {
+    std::vector<Account> accounts;
+    int accountNumberCounter = 1000;
 
-	while (1) {
-		cout << "\n~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			<< "~~~WELCOME~~~~~~~~~~~~~~~~~~"
-			<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-			<< "~~~~~~~~~\n\n";
-		cout << "Enter Your Choice\n";
-		cout << "\t1. Enter name, Account "
-			<< "number, Account type\n";
-		cout << "\t2. Balance Enquiry\n";
-		cout << "\t3. Deposit Money\n";
-		cout << "\t4. Show Total balance\n";
-		cout << "\t5. Withdraw Money\n";
-		cout << "\t6. Cancel\n";
-		cin >> choice;
+    while (true) {
+        std::cout << "1. Create Account\n2. Deposit\n3. Withdraw\n4. Display Account Details\n5. Exit" << std::endl;
+        int choice;
+        std::cin >> choice;
 
-		switch (choice) {
-            case 1:
-                b.setvalue();
+        switch (choice) {
+            case 1: {
+                std::string holder;
+                double initialBalance;
+                std::cout << "Enter account holder's name: ";
+                std::cin >> holder;
+                std::cout << "Enter initial balance: ";
+                std::cin >> initialBalance;
+                accounts.emplace_back(accountNumberCounter++, holder, initialBalance);
+                std::cout << "Account created with number " << accountNumberCounter - 1 << std::endl;
                 break;
-            case 2:
-                b.showdata();
+            }
+            case 2: {
+                int accountNumber;
+                double amount;
+                std::cout << "Enter account number: ";
+                std::cin >> accountNumber;
+                std::cout << "Enter deposit amount: ";
+                std::cin >> amount;
+                for (Account& acc : accounts) {
+                    if (acc.getAccountNumber() == accountNumber) {
+                        acc.deposit(amount);
+                        break;
+                    }
+                }
                 break;
-            case 3:
-                b.deposit();
+            }
+            case 3: {
+                int accountNumber;
+                double amount;
+                std::cout << "Enter account number: ";
+                std::cin >> accountNumber;
+                std::cout << "Enter withdrawal amount: ";
+                std::cin >> amount;
+                for (Account& acc : accounts) {
+                    if (acc.getAccountNumber() == accountNumber) {
+                        acc.withdraw(amount);
+                        break;
+                    }
+                }
                 break;
-            case 4:
-                b.showbal();
+            }
+            case 4: {
+                int accountNumber;
+                std::cout << "Enter account number: ";
+                std::cin >> accountNumber;
+                for (const Account& acc : accounts) {
+                    if (acc.getAccountNumber() == accountNumber) {
+                        acc.display();
+                        break;
+                    }
+                }
                 break;
+            }
             case 5:
-                b.withdrawl();
-                break;
-            case 6:
-                exit(1);
-                break;
+                std::cout << "Exiting program." << std::endl;
+                return 0;
             default:
-                cout << "\nInvalid choice\n";
-		}
-	}
+                std::cout << "Invalid choice. Please choose a valid option." << std::endl;
+        }
+    }
 
-	return EXIT_SUCCESS;
+    return 0;
 }
+
